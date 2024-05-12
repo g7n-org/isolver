@@ -1,0 +1,52 @@
+#!/usr/bin/env -S bash
+### 
+### isolver - an interactive syntax generator for pctX-compliant letter division
+###           puzzle solution files.  If no identifying information is provided,
+###           assume current directory is project name, and look in that current
+###           directory for the viable 'puzzle' file.
+### 
+###    usage: isolver [OPTION..] [project_name] [puzzle_file]
+### 
+### options - description
+### =======   ==================================================================
+###  replay   process steps in compliant solution file to completion
+###  resume   replay solution steps and remain in interactive mode
+### version   display version information and exit
+###    help   display this help information and exit
+### 
+########################################################################################
+
+########################################################################################
+##
+## Check for arguments
+##
+DO_HELP=$(echo "${*}" | egrep -qio '\<help\>'    && echo "true" || echo "false")
+VERSION=$(echo "${*}" | egrep -qio '\<version\>' && echo "true" || echo "false")
+
+########################################################################################
+##
+## Display help if needed
+##
+[ "${DO_HELP}" = "true" ] && cat ${0} | grep '^### ' | sed 's/^###//' && exit 0
+
+########################################################################################
+##
+## Top-level variables
+##
+AUTHOR="Matthew Haas <haas@g7n.org>"
+ORG="g7n.org"
+SUITE="ltrdiv"
+PROJECT="isolver"
+RELEASE="20240512-065109"
+
+########################################################################################
+##
+## Display version information if needed
+##
+if [ "${VERSION}" = "true" ]; then
+	echo    "${SUITE}/${PROJECT} release ${RELEASE}"
+	echo    "by ${AUTHOR}"
+	exit 0
+fi
+
+exit 0
