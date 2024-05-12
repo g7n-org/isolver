@@ -25,6 +25,13 @@ VERSION=$(echo "${*}" | egrep -qio '\<version\>' && echo "true" || echo "false")
 
 ########################################################################################
 ##
+## Finalize argument list (ARGLIST)
+##
+OPTIONS='\<(help|version|replay|resume)\>'
+ARGLIST=$(echo "${*}" | tr ' ' '\n' | egrep -v "${OPTIONS}"     |  tr '\n' ' ')
+
+########################################################################################
+##
 ## Display help if needed
 ##
 [ "${DO_HELP}" = "true" ] && cat ${0} | grep '^### ' | sed 's/^###//' && exit 0
@@ -37,7 +44,8 @@ AUTHOR="Matthew Haas <haas@g7n.org>"
 ORG="g7n.org"
 SUITE="ltrdiv"
 PROJECT="isolver"
-RELEASE="20240512-065109"
+RELEASE="20240512-074716"
+PUZZLE=$(echo "${ARGLIST}" | cut -d' ' -f1)
 
 ########################################################################################
 ##
@@ -48,5 +56,38 @@ if [ "${VERSION}" = "true" ]; then
 	echo    "by ${AUTHOR}"
 	exit 0
 fi
+
+########################################################################################
+##
+## puzzle input attempts at location, or error
+##
+[      -z "${PUZZLE}" ] && PUZZLE="puzzle"
+if [ ! -r "${PUZZLE}" ]; then
+	SEMESTER=$(cat /usr/local/etc/semester)
+	PUBLIC="/var/public/${SEMESTER}/.common/${PUZZLE}/${USER}/puzzle"
+	if [ ! -r "${PUBLIC}" ]; then
+		echo    "ERROR: cannot locate suitable puzzle file (${PUZZLE})"
+		exit 1
+	fi
+	PUZZLE="${PUBLIC}"
+fi
+
+########################################################################################
+##
+## attempt to validate puzzle file as actual puzzle
+##
+pchk=$(cat ${PUZZLE} | egrep '^(base|letters|difficulty):' | wc -l)
+[ "${pchk}" -lt 3 ] && echo    "ERROR: ${PUZZLE} does not seem to be valid!" && exit 2
+
+########################################################################################
+##
+## Construct the on-screen display
+##
+function display()
+{
+	cat ${PUZZLE}
+}
+
+display
 
 exit 0
