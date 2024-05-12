@@ -87,14 +87,18 @@ pchk=$(cat ${PUZZLE} | egrep '^(base|letters|difficulty):' | wc -l)
 ##
 function puzzle_init()
 {
-	echo "initing"
-	cat ${PUZZLE} | grep -v ':'  | grep -v '^$' >  ${TMPFILE}.pzl
-	dsor=$(cat ${TMPFILE}.pzl    | grep '|' | cut -d'|' -f1)
-	dsorlen=$(echo "${dsor}"     | wc -L)
-	cat ${TMPFILE}.pzl           | cut -c1-${dsorlen}
-	let dsorlen=dsorlen+1
-	cat ${TMPFILE}.pzl           | cut -c${dsorlen}- | sed 's/\(.\)/\1 /g'
+	#echo "initing"
+	cat ${PUZZLE} | grep -v ':' | grep -v '^$'                     >  ${TMPFILE}.pzl
+	dsor=$(cat ${TMPFILE}.pzl   | grep '|' | cut -d'|' -f1)
+	dsorlen=$(echo "${dsor}"    | wc -L)
+	let dsorlen=dsorlen-1
+	cat ${TMPFILE}.pzl | cut -c1-${dsorlen}                        >  ${TMPFILE}.left
+	let dsorlen=dsorlen+2
+	cat ${TMPFILE}.pzl | cut -c${dsorlen}- | sed 's/\(.\)/\1 /g'   >  ${TMPFILE}.right
+	paste -d' ' ${TMPFILE}.left ${TMPFILE}.right                   >  ${TMPFILE}
 	PZLINIT="true"
+	# | grep '  - ' | head -1 | tail -1 | cut -d'-' -f2 | wc -L # obtain subtrahend length
+	# | head -6     | tail -4 | cut -c10-20 | cut -d' ' -f6     # isolate individual subtractions
 }
 
 ########################################################################################
@@ -103,13 +107,13 @@ function puzzle_init()
 ##
 function display()
 {
-	echo "lets gooo"
+	#echo "lets gooo"
 	cat ${PUZZLE}
 }
 
 puzzle_init
-#display
+display
 
-rm -f ${TMPFILE}.*
+rm -f ${TMPFILE}*
 
 exit 0
