@@ -46,6 +46,8 @@ SUITE="ltrdiv"
 PROJECT="isolver"
 RELEASE="20240512-074716"
 PUZZLE=$(echo "${ARGLIST}" | cut -d' ' -f1)
+PZLINIT="false"
+TMPFILE=$(mktemp -p '/tmp' isolver.${USER}.XXXX)
 
 ########################################################################################
 ##
@@ -81,13 +83,33 @@ pchk=$(cat ${PUZZLE} | egrep '^(base|letters|difficulty):' | wc -l)
 
 ########################################################################################
 ##
+## Initialize puzzle elements for interactive session
+##
+function puzzle_init()
+{
+	echo "initing"
+	cat ${PUZZLE} | grep -v ':'  | grep -v '^$' >  ${TMPFILE}.pzl
+	dsor=$(cat ${TMPFILE}.pzl    | grep '|' | cut -d'|' -f1)
+	dsorlen=$(echo "${dsor}"     | wc -L)
+	cat ${TMPFILE}.pzl           | cut -c1-${dsorlen}
+	let dsorlen=dsorlen+1
+	cat ${TMPFILE}.pzl           | cut -c${dsorlen}- | sed 's/\(.\)/\1 /g'
+	PZLINIT="true"
+}
+
+########################################################################################
+##
 ## Construct the on-screen display
 ##
 function display()
 {
+	echo "lets gooo"
 	cat ${PUZZLE}
 }
 
-display
+puzzle_init
+#display
+
+rm -f ${TMPFILE}.*
 
 exit 0
